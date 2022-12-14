@@ -6,14 +6,19 @@ readme上传上来才发先显示好奇怪！甚至换行都不一样，难道ma
 
 ## 12.14 16:03
 接下来是要试图用多线程解决掉这个按键卡顿的bug，
+
 原理我自个想的是截获按键消息后创建一个线程让蜂鸣器自己去响，
+
 不要影响按键消息的流通，不知道行不行得通，我先做做！！
 
 ## 12.14 15:51
 这个原理其实就是通过截取windows下发给应用程序的按键信息，然后触发程序里的Bepp(freq,time)，之后放行这个信息
+
 所以这样linear的操作就使得打字太快会有延迟...目前就是想要解决这个延迟问题
 
 具体原理，截取信息就是用钩子把信息钓到：
+
+```cpp
 ==这部分是Hook()函数里面需要用到的一个可回调的函数==  
 LRESULT CALLBACK KeyboardProc(int code,WPARAM wParam,LPARAM lParam){  
 	if (code == HC_ACTION){  
@@ -45,32 +50,56 @@ void Hook(){
 		printf("Hooked!");  
 	}  
 }  
+```
+
+```cpp
 ==除此二者之外就是要在main()写一个消息循环==  
 	MSG msg;  
 	while(GetMessage(&msg,NULL,0,0)){  
 		TranslateMessage(&msg);//翻译  
 		DispatchMessage(&msg);//分发消息  
 	}  
+```
 没有这个循环就没办法触发响应  
+
 这里感谢好朋友Buger404帮我弄明白到底咋做这个事情，看了不少参考资料，
+
 水平还很菜，希望在寒假里面能学到如何做这样子自己的一个项目
 
 
 ## 12.14 15:43
 正在学习如何用git和github
-initialize:  
-	git init  
-	git add repo url  
 
-pull:  
-	git pull repo branch //我用的是main的名称 别搞错多弄了branch  
-push:  
-	git add . //将目录下所有文件加入，或把“.”替换为文件名  
-	git commit -m "new things"  
-	git push repo branch  
-出现error: src refspec main does not match any：  
-	大概是文件中有冲突无法合并的，需要去文件中修改冲突  
-rename:  
-	git rename old new  
-没有使用ssh 配置老是不成功 先这样凑合用吧  
+* initialize:  
+
+  ```bash
+  git init  
+  git add repo url  
+  ```
+
+* pull:  
+
+  ```bash
+  git pull repo branch //我用的是main的名称 别搞错多弄了branch  
+  ```
+
+* push:  
+
+  ```bash
+  git add . //将目录下所有文件加入，或把“.”替换为文件名  
+  git commit -m "new things"  
+  git push repo branch  
+  ```
+
+* 出现error：`src refspec main does not match any：  `
+
+  大概是文件中有冲突无法合并的，需要去文件中修改冲突  
+
+* rename:  
+
+  ```bash
+  git rename old new  
+  ```
+
+  没有使用ssh 配置老是不成功 先这样凑合用吧  
 
