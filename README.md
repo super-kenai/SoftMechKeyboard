@@ -103,3 +103,9 @@ void Hook(){
 
   没有使用ssh 配置老是不成功 先这样凑合用吧  
 
+* 出现fatal: unable to access url： OpenSSL SSL_read: Connection was aborted, errno 10053
+
+  ```bash
+  git config --global http.sslVerify "false"
+  ```
+
