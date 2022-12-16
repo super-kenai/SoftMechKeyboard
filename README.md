@@ -1,6 +1,34 @@
 # SoftMechKeyboard
 使用软件手段模拟机械键盘的声音(A program imitate mechanical keboard sounds)
 
+## 12.16 20:09
+哈哈 刚刚用多线程技术改好了原来的卡键盘的bug 也就是说现在不会长按删除键把不想删的东西删掉了23333
+原来会卡的原因是：
+```cpp
+//KeyboardProc()里
+	case WM_KEYDOWN:
+		Beep();
+...
+//会在如下一步之前阻塞整个线程，导致按键信息无法继续传递，造成打字的时候卡顿
+	return CallNextHookEx(g_hHook,code,wParam,lParam);
+```
+解决办法就是新创建一个线程来运行Beep（）
+
+需要用到thread头文件（include<thread>）
+
+```cpp
+void myBeep(){
+	Beep(1000,60)
+}
+//线程需要入口的函数，所以这里的myBeep（）就是一个入口函数
+//在proc（）里写：
+	case WM_KEYDOWN:
+		thread myB(myBeep);
+		myB.detach()
+//这里detach（）是让主线程不要等子线程的意思
+//若使用join（）则是让主线程在这里等子线程，那就又会阻塞
+```
+
 ## 12.14 16:25
 readme上传上来才发先显示好奇怪！甚至换行都不一样，难道markdown也有方言嘛？
 
