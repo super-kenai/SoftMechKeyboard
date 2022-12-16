@@ -1,8 +1,14 @@
 #include<stdio.h>
 #include<Windows.h>
 //#include<ctime>
+#include<thread>
+using namespace std;
 
 HHOOK g_hHook = NULL ;
+
+void myBeep(){
+	Beep(1000,60);
+}
 
 LRESULT CALLBACK KeyboardProc(int code,WPARAM wParam,LPARAM lParam){
 	if (code == HC_ACTION){
@@ -10,8 +16,9 @@ LRESULT CALLBACK KeyboardProc(int code,WPARAM wParam,LPARAM lParam){
 		sprintf_s(msg,"StringRecieved: %c \r\n",wParam);
 		switch (wParam){
 			case WM_KEYDOWN:
-				Beep(1000,60);
-		}
+				thread myB(myBeep);
+				myB.detach();
+		}	
 		OutputDebugString(msg);
 	}
 	return CallNextHookEx(g_hHook,code,wParam,lParam);
