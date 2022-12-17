@@ -1,6 +1,36 @@
 # SoftMechKeyboard
 使用软件手段模拟机械键盘的声音(A program imitate mechanical keboard sounds)
 
+## 12.17 23:42
+stm32学习好复杂的，关于硬件部分还得让子弹飞飞，我觉得确实不应该用stm32，今天小做了一个自定义发声的版本
+
+就是用windows自带的PlaySound()函数！
+
+```cpp
+//以下是微软官方定义
+BOOL PlaySound(
+   LPCTSTR pszSound,
+   HMODULE hmod,
+   DWORD   fdwSound
+);
+```
+其中pszSound就是文件路径参数，hmod好像具体用处不清楚，一般填NULL
+
+fdwSound就是决定这个文件怎么播放，我在这里设定了```cpp 
+SND_FILENAME | SND_NOWAIT | SND_ASYNC ```三个参数
+
+就是用文件名播放 播放冲突直接跳过 播放后直接执行下一条（其实我感觉就最后一个有用 不过无所谓啦 做着玩）
+
+还有要注意在devc里面的编译选项里 在连接器中加入 “ -lwinmm” 这一句 
+
+不加我过不了编译 具体原理就不深究了吧
+
+然后关于音效 随手找了一个鸡你太美的（露出鸡脚了）音效试了一下 整活确实是好手 
+
+但是我其实没很喜欢这样搞 毕竟我希望软件使用简洁一点 所以目前版本里我是注释掉了
+
+说不定以后可以搞苹果按键音？ 以后再说罢！！
+
 ## 12.16 23:20
 555刚出门吃碗粉电动车车胎爆了，明天跟hxd去吃早饭顺便修车
 
