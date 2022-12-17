@@ -1,5 +1,7 @@
 #include<stdio.h>
 #include<Windows.h>
+#include<mmsystem.h>
+#pragma comment(lib,"winmm.lib")
 //#include<ctime>
 #include<thread>
 using namespace std;
@@ -7,7 +9,11 @@ using namespace std;
 HHOOK g_hHook = NULL ;
 
 void myBeep(){
-	Beep(1000,60);
+	Beep(1100,50);
+}
+
+void G(){
+	PlaySound(TEXT("D:\\ShitT_Files\\Coding\\Soft-nicalKeyboard\\G.wav"),NULL,SND_FILENAME | SND_NOWAIT | SND_ASYNC);
 }
 
 LRESULT CALLBACK KeyboardProc(int code,WPARAM wParam,LPARAM lParam){
@@ -16,8 +22,10 @@ LRESULT CALLBACK KeyboardProc(int code,WPARAM wParam,LPARAM lParam){
 		sprintf_s(msg,"StringRecieved: %c \r\n",wParam);
 		switch (wParam){
 			case WM_KEYDOWN:
-				thread myB(myBeep);
-				myB.detach();
+				//thread myB(myBeep);
+				//myB.detach();
+				thread GI(G);
+				GI.detach();
 		}	
 		OutputDebugString(msg);
 	}
