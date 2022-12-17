@@ -22,10 +22,10 @@ LRESULT CALLBACK KeyboardProc(int code,WPARAM wParam,LPARAM lParam){
 		sprintf_s(msg,"StringRecieved: %c \r\n",wParam);
 		switch (wParam){
 			case WM_KEYDOWN:
-				//thread myB(myBeep);
-				//myB.detach();
-				thread GI(G);
-				GI.detach();
+				thread myB(myBeep);
+				myB.detach();
+				//thread GI(G);
+				//GI.detach();
 		}	
 		OutputDebugString(msg);
 	}
