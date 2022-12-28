@@ -1,14 +1,12 @@
 #include<stdio.h>
 #include<windows.h>
-//G()
-#include<mmsystem.h>
-#pragma comment(lib,"winmm.lib")
-#include<iostream>
 #include<string.h>
 #include<stdlib.h>
-//#include<ctime>
 #include<thread>
 using namespace std;
+//G()
+//#include<mmsystem.h>
+//#pragma comment(lib,"winmm.lib")
 
 HHOOK g_hHook = NULL ;
 //set up com3
@@ -56,10 +54,10 @@ BOOL STA;
 void MCUBeep(){
 	STA=WriteFile(com3,(LPVOID)data,numToWrite,&writtenNum,NULL);
 }
-
+/*
 void G(){
 	PlaySound(TEXT("D:\\ShitT_Files\\Coding\\Soft-nicalKeyboard\\G.wav"),NULL,SND_FILENAME | SND_NOWAIT | SND_ASYNC);
-}
+}*/
 
 LRESULT CALLBACK KeyboardProc(int code,WPARAM wParam,LPARAM lParam){
 	if (code == HC_ACTION){
