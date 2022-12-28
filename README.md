@@ -1,6 +1,131 @@
 # SoftMechKeyboard
 使用软件手段模拟机械键盘的声音(A program imitate mechanical keboard sounds)
 
+## 12.28 21:47
+子弹飞了很久也没飞到，但是最终还是有一点点小成果：实现了最基本的功能！
+
+用的确实是stm32，确实觉得大材小用，因为这本质应该是一个继电器干的事情...
+
+32上的串口通信其实比较简洁明了的
+
+- Led的初始化函数
+	- 定义结构体
+	- 使能gpio时钟
+	- 结构体赋值
+	- 初始化led
+- USART1初始化函数
+	- 定义USART、GPIO、NVIC初始化结构体
+	- 使能gpio和USART时钟
+	- 设置GPIOA的9和10引脚复用为USART1
+	- GPIO结构体赋值 初始化GPIO
+	- USART结构体赋值 初始化USART
+	- NVIC结构体赋值 初始化NVIC
+- 串口中断处理函数
+	- 检测是否是接受寄存器中断
+	- 读数据
+	- 闪烁LED（对就是在这里莫名奇妙插进来）
+	- 重复接收 》是否接收完毕 是否接受错误重新接收
+	- 接收完毕将STA寄存器写入完毕标识符
+- 主函数
+	- 执行各种初始化函数
+	- while（1）卡住 （不是）
+		- 检测STA是否为写入完毕 
+			- STA置零
+
+win端的原理就是用win32的api实现串口通信，然后把串口发信息的函数在按键按下的处理函数里面调用一下
+
+也就是替换了MyBeep（）函数的位置，
+
+串口重要的几个地方就是
+
+设置串口（初始化？）：
+- HANDLE com CreateFile();
+- DCB dcb;dcb. ;DCB for Device Control Block
+- COMMTIMEOUTS cto;cto. ;串口超时
+- SetCommTimeouts(com3,&cto);设定串口超时
+- SetupComm(com3,200,200);开启端口
+
+写串口：
+- char data[3]="ab";这里data类型应该char就好 反正后续有一个强制转型
+- DWORD  numToWrite = strlen(data);要写入的长度
+- DWORD  writtenNum;已写入的长度
+- BOOL STA;是否写完
+- STA=WriteFile(com3,(LPVOID)data,numToWrite,&writtenNum,NULL);
+
+读串口：（尚未探究）
+
+代码大致如下：
+```cpp
+#include<stdio.h>
+#include<windows.h>
+#include<string.h>
+#include<stdlib.h>
+#include<thread>
+using namespace std;//头文件
+
+/*
+...重复代码不展示了
+*/
+
+HANDLE com3;//这里这个com3为句柄类型，后面都要用到的
+
+void com3Init(){
+	com3 = CreateFile(...);
+	if(com3==INVALID_HANDLE_VALUE){
+		printf("shit!");
+	}
+	//DCB setting
+	DCB dcb;
+	//...dcb相关参数设定，dcb和通信的参数约定有很大关系，可能就是在这里出错
+	
+	//timeout setting
+	COMMTIMEOUTS cto;
+	//...cto相关参数设定，超时什么的 没有大概问题也不很大
+	SetupComm(com3,200,200);//开启com3 设定输入输出缓冲区都为200
+}
+
+char data[3]="ab";
+DWORD  numToWrite = strlen(data);
+DWORD  writtenNum;
+BOOL STA;
+//上面是准备发送的相关参数
+void MCUBeep(){
+	STA=WriteFile(com3,(LPVOID)data,numToWrite,&writtenNum,NULL);
+	//就是所谓的从com3发送的句子，这里overlapped设置成NULL，本来也要传一个结构体指针的
+}
+
+LRESULT CALLBACK KeyboardProc(int code,WPARAM wParam,LPARAM lParam){
+/*
+不重要代码
+*/
+		switch (wParam){
+			case WM_KEYDOWN://按键消息触发
+				thread mcuB(MCUBeep);
+				mcuB.detach();
+			}
+/*
+不重要代码
+*/
+}
+
+/*
+省略原有代码
+*/
+```
+
+
+是不是看起来很理想很ok？
+
+其实！很折磨！！！在32的程序 串口中断处理函数那边的闪烁led就是和win端妥协的产品
+
+这样就完全没有拓展性，但凡是涉及任何其他操作都做不了 没办法调整硬件部分！！纯纯继电器！！！
+
+32是完全接受到信息了，但是估计是信息的某些地方有问题，32不认这信息，导致STA没办法被写入完毕标识符
+
+电脑是可以发出这种信息的，用XCOM实验的时候就可以，那就一定是上位机代码的问题
+
+> 22：30：我好像看到哪里不对劲了 发完这个就改改试试！
+	
 ## 12.17 23:42
 stm32学习好复杂的，关于硬件部分还得让子弹飞飞，我觉得确实不应该用stm32，今天小做了一个自定义发声的版本
 
