@@ -1,6 +1,17 @@
 # SoftMechKeyboard
 使用软件手段模拟机械键盘的声音(A program imitate mechanical keboard sounds)
 
+## 12.28 22：54
+确实是漏掉东西了 就是在dcb初始化完了得设置串口状态 不然发送的信号当然不对了
+
+但是现在又有新bug
+
+就是在DevC里面开起来就可以正常使用
+
+但是编译后从文件目录直接开启程序就没办法正常运行 
+
+很疑惑...
+
 ## 12.28 21:47
 子弹飞了很久也没飞到，但是最终还是有一点点小成果：实现了最基本的功能！
 
@@ -44,6 +55,7 @@ win端的原理就是用win32的api实现串口通信，然后把串口发信息
 - COMMTIMEOUTS cto;cto. ;串口超时
 - SetCommTimeouts(com3,&cto);设定串口超时
 - SetupComm(com3,200,200);开启端口
+- SetCommState(com3，&dcb);这里先前漏掉了 是设置串口状态的句子
 
 写串口：
 - char data[3]="ab";这里data类型应该char就好 反正后续有一个强制转型
