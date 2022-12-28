@@ -1,15 +1,59 @@
 #include<stdio.h>
-#include<Windows.h>
+#include<windows.h>
+//G()
 #include<mmsystem.h>
 #pragma comment(lib,"winmm.lib")
+#include<iostream>
+#include<string.h>
+#include<stdlib.h>
 //#include<ctime>
 #include<thread>
 using namespace std;
 
 HHOOK g_hHook = NULL ;
+//set up com3
+HANDLE com3;
+
+void com3Init(){
+	com3 = CreateFile(
+		"COM3",
+		GENERIC_READ|GENERIC_WRITE,
+		0,
+		NULL,
+		OPEN_EXISTING,
+		0,
+		NULL);
+	if(com3==INVALID_HANDLE_VALUE){
+		printf("shit!");
+	}
+	//DCB setting
+	DCB dcb;
+	dcb.BaudRate=115200;
+	dcb.Parity=0;
+	dcb.StopBits=1;
+	dcb.ByteSize=8;
+	//timeout setting
+	COMMTIMEOUTS cto;
+	cto.ReadIntervalTimeout = 0xFFFFFFFF;
+	cto.WriteTotalTimeoutConstant=5000;
+	cto.WriteTotalTimeoutMultiplier=0;
+	cto.ReadTotalTimeoutMultiplier=0;
+	cto.ReadTotalTimeoutConstant=0;
+	SetCommTimeouts(com3,&cto);
+	SetupComm(com3,200,200);
+}
+
 
 void myBeep(){
-	Beep(1100,50);
+	Beep(1100,100);
+}
+
+char data[3]="ab";
+DWORD  numToWrite = strlen(data);
+DWORD  writtenNum;
+BOOL STA;
+void MCUBeep(){
+	STA=WriteFile(com3,(LPVOID)data,numToWrite,&writtenNum,NULL);
 }
 
 void G(){
@@ -22,8 +66,10 @@ LRESULT CALLBACK KeyboardProc(int code,WPARAM wParam,LPARAM lParam){
 		sprintf_s(msg,"StringRecieved: %c \r\n",wParam);
 		switch (wParam){
 			case WM_KEYDOWN:
-				thread myB(myBeep);
-				myB.detach();
+				//thread myB(myBeep);
+				//myB.detach();
+				thread mcuB(MCUBeep);
+				mcuB.detach();
 				//thread GI(G);
 				//GI.detach();
 		}	
@@ -64,6 +110,7 @@ void Delay(int time){
 
 int main(void){
 	//HWND cu = FindWindow(NULL,"D:\ShitT_Files\Coding\keyDetective\key.exe");
+	com3Init();
 	Hook();
 	MSG msg;
 	while(GetMessage(&msg,NULL,0,0)){
