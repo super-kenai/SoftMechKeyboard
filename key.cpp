@@ -40,6 +40,7 @@ void com3Init(){
 	cto.ReadTotalTimeoutMultiplier=0;
 	cto.ReadTotalTimeoutConstant=0;
 	SetCommTimeouts(com3,&cto);
+	SetCommState(com3,&dcb);
 	SetupComm(com3,200,200);
 }
 

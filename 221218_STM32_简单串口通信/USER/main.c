@@ -77,9 +77,9 @@ void USART1_IRQHandler(){
 	if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 	{
 		Res =USART_ReceiveData(USART1);//(USART1->DR);	//读取接收到的数据
-		GPIO_ResetBits(GPIOF,GPIO_Pin_9);
-		delay_ms(60);
-		GPIO_SetBits(GPIOF,GPIO_Pin_9);
+		//GPIO_ResetBits(GPIOF,GPIO_Pin_9);
+		//delay_ms(60);
+		//GPIO_SetBits(GPIOF,GPIO_Pin_9);
 		if((USART_RX_STA&0x8000)==0)//接收未完成
 		{
 			if(USART_RX_STA&0x4000)//接收到了0x0d
@@ -110,9 +110,9 @@ int main(void){
 	while(1){
 		if(USART_RX_STA&0x8000)
 		{	
-			//GPIO_ResetBits(GPIOF,GPIO_Pin_9);
-			//delay_ms(60);
-			//GPIO_SetBits(GPIOF,GPIO_Pin_9);
+			GPIO_ResetBits(GPIOF,GPIO_Pin_9);
+			delay_ms(60);
+			GPIO_SetBits(GPIOF,GPIO_Pin_9);
 			/*
 			len=USART_RX_STA&0x3fff;//得到此次接收到的数据长度
 			for(t=0;t<len;t++)
