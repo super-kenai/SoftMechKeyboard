@@ -8,6 +8,8 @@ using namespace std;
 //#include<mmsystem.h>
 //#pragma comment(lib,"winmm.lib")
 
+int err=0;
+
 HHOOK g_hHook = NULL ;
 //set up com3
 HANDLE com3;
@@ -23,6 +25,7 @@ void com3Init(){
 		NULL);
 	if(com3==INVALID_HANDLE_VALUE){
 		printf("shit!");
+		err=1;
 	}
 	//DCB setting
 	DCB dcb;
@@ -47,7 +50,7 @@ void myBeep(){
 	Beep(1100,100);
 }
 
-char data[3]="ab";
+char data[5]="ab\r\n";
 DWORD  numToWrite = strlen(data);
 DWORD  writtenNum;
 BOOL STA;
@@ -65,10 +68,15 @@ LRESULT CALLBACK KeyboardProc(int code,WPARAM wParam,LPARAM lParam){
 		sprintf_s(msg,"StringRecieved: %c \r\n",wParam);
 		switch (wParam){
 			case WM_KEYDOWN:
-				//thread myB(myBeep);
-				//myB.detach();
-				thread mcuB(MCUBeep);
-				mcuB.detach();
+				if(err==0){
+					thread mcuB(MCUBeep);
+					mcuB.detach();	
+				}
+				else{
+					thread myB(myBeep);
+					myB.detach();
+				}
+				
 				//thread GI(G);
 				//GI.detach();
 		}	

@@ -1,0 +1,88 @@
+;/*++
+;
+;Copyright (c) 2000-2008 ELTIMA Software
+;
+;Module Name:
+;
+;    evserial.inf
+;
+;Abstract:
+;
+;    INF file for installing VSPorts class with Virtual Serial Port device driver.
+;
+;--*/
+[Version]
+Signature="$WINDOWS NT$"
+Class=EVSPorts
+ClassGuid={28A57F37-88BD-4753-BAA0-B013AA31C51B}
+Provider=%ELTIMA%
+DriverVer=05/05/2008,6.2.41
+CatalogFile=evserial.cat
+
+[DestinationDirs]
+Drivers_Dir = 12
+
+[SourceDisksNames]
+1 = %DiskId1%,,,""
+
+[SourceDisksFiles]
+evserial.sys = 1,,
+
+; ================= Class section =====================
+[ClassInstall32]
+Addreg=EVSerialClassReg     
+
+[EVSerialClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-23
+HKR,,SilentInstall,,1
+HKR,,NoInstallClass,,1
+
+;*********************************************
+; Virtual Serial Port Device  Install Section
+;*********************************************
+[Manufacturer]
+%ELTIMA%=Eltima, NTx86, NTia64, NTamd64
+
+;2000
+[Eltima]
+%EVSerialDevice.DeviceDesc%=EVSerial_Device, EVSERIAL
+
+;x86
+[Eltima.NTx86]
+%EVSerialDevice.DeviceDesc%=EVSerial_Device, EVSERIAL
+
+;AMD64
+[Eltima.NTamd64]
+%EVSerialDevice.DeviceDesc%=EVSerial_Device, EVSERIAL
+
+;IA64
+[Eltima.NTia64]
+%EVSerialDevice.DeviceDesc%=EVSerial_Device, EVSERIAL
+
+[EVSerial_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+evserial.sys
+
+;-------------- Service installation
+[EVSerial_Device.NT.Services]
+AddService = evserial, %SPSVCINST_ASSOCSERVICE%, evserial_Service_Inst
+
+; -------------- evserial Driver install sections
+[evserial_Service_Inst]
+DisplayName    = %evserial.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START 
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\evserial.sys
+LoadOrderGroup = Extended Base
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ELTIMA = "ELTIMA Software"
+ClassName = "Virtual Serial Ports (Eltima Softwate)"
+EVSerialDevice.DeviceDesc = "Virtual Serial Port (Eltima Softwate)"
+evserial.SVCDESC = "Virtual Serial Ports Driver (Eltima Softwate)"
+DiskId1 = "Virtual Serial Bus Installation Disk #1"
